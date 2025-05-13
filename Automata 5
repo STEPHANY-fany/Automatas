@@ -1,0 +1,130 @@
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+
+public class AutomataFD2 {
+    private String estadoActual;
+    private final String estadoInicial = "E2";
+    private final String estadoAceptacion = "E1"; 
+    private final String estadoRechazo = "E3";
+
+    private final Map<String, Map<String, Map<String, String>>> transiciones;
+
+    public AutomataFD2() {
+        estadoActual = estadoInicial;
+        transiciones = new HashMap<>();
+
+        
+        
+    
+        Map<String, Map<String, String>> e1Transitions = new HashMap<>();
+        
+        
+        Map<String, String> q4Transitions = new HashMap<>();
+        q4Transitions.put("a", "q2,E2");
+        q4Transitions.put("b", "q5,E1");
+        e1Transitions.put("q4", q4Transitions);
+        
+        
+        Map<String, String> q5Transitions = new HashMap<>();
+        q5Transitions.put("a", "q2,E2");
+        q5Transitions.put("b", "q4,E1");
+        e1Transitions.put("q5", q5Transitions);
+        
+        transiciones.put("E1", e1Transitions);
+
+        
+        Map<String, Map<String, String>> e2Transitions = new HashMap<>();
+        
+        
+        Map<String, String> q0Transitions = new HashMap<>();
+        q0Transitions.put("a", "q2,E2");
+        q0Transitions.put("b", "q1,E2");
+        e2Transitions.put("q0", q0Transitions);
+        
+        
+        Map<String, String> q1Transitions = new HashMap<>();
+        q1Transitions.put("a", "q2,E2");
+        q1Transitions.put("b", "q1,E2");
+        e2Transitions.put("q1", q1Transitions);
+        
+    
+        Map<String, String> q2Transitions = new HashMap<>();
+        q2Transitions.put("a", "q2,E2");
+        q2Transitions.put("b", "q3,E3");
+        e2Transitions.put("q2", q2Transitions);
+        
+        transiciones.put("E2", e2Transitions);
+
+        
+        Map<String, Map<String, String>> e3Transitions = new HashMap<>();
+        
+      
+        Map<String, String> q3Transitions = new HashMap<>();
+        q3Transitions.put("a", "q2,E2");
+        q3Transitions.put("b", "q4,E1");
+        e3Transitions.put("q3", q3Transitions);
+        
+        transiciones.put("E3", e3Transitions);
+    }
+
+    public boolean procesarAutomata(String cadena) {
+        
+        String currentSuperState = estadoInicial;
+        String currentSubState = "q0";
+        
+        for (int i = 0; i < cadena.length(); i++) {
+            char c = cadena.charAt(i);
+            String simbolo = String.valueOf(c);
+            
+            if (!transiciones.containsKey(currentSuperState)) {
+                System.out.println("Estado no valido: " + currentSuperState);
+                return false;
+            }
+            
+            Map<String, Map<String, String>> superStateTransitions = transiciones.get(currentSuperState);
+            
+            if (!superStateTransitions.containsKey(currentSubState)) {
+                System.out.println("Sub-estado no valido: " + currentSubState);
+                return false;
+            }
+            
+            Map<String, String> stateTransitions = superStateTransitions.get(currentSubState);
+            
+            if (!stateTransitions.containsKey(simbolo)) {
+                System.out.println("Símbolo no valido: '" + simbolo + "'");
+                return false;
+            }
+            
+            String[] nextState = stateTransitions.get(simbolo).split(",");
+            currentSubState = nextState[0];
+            currentSuperState = nextState[1];
+            
+            System.out.println("Transición: " + simbolo + " -> " + currentSuperState + "," + currentSubState);
+        }
+        
+        return currentSuperState.equals(estadoAceptacion);
+    }
+    
+    public static void main(String[] args) {
+        AutomataFD2 automata = new AutomataFD2();
+        
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Introduce una cadena (solo 'a' o 'b'): ");
+        String cadena = scanner.nextLine();
+
+      
+        if (!cadena.matches("[ab]+")) {
+            System.out.println("Cadena invalida. Solo se permiten los símbolos 'a' y 'b'");
+            scanner.close();
+            return;
+        }
+
+        if (automata.procesarAutomata(cadena)) {
+            System.out.println("Cadena aceptada");
+        } else {
+            System.out.println("Cadena rechazada");
+        }
+        scanner.close();
+    }
+}
