@@ -1,0 +1,79 @@
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+
+public class AutomataFD3 {
+    private String estadoActual;
+    private final String estadoInicial = "E1";
+    private final String[] estadosAceptacion = {"E1", "E4"};
+
+    private final Map<String, Map<String, String>> transiciones;
+
+    public AutomataFD3() {
+        estadoActual = estadoInicial;
+        transiciones = new HashMap<>();
+
+      
+        Map<String, String> transE1 = new HashMap<>();
+        transE1.put("a", "E1");
+        transE1.put("b", "E1");
+        transE1.put("c", "E1");
+        transiciones.put("E1", transE1);
+
+        
+        Map<String, String> transE2 = new HashMap<>();
+        transE2.put("a", "E3");
+        transE2.put("b", "E4");
+        transE2.put("c", "E1");
+        transiciones.put("E2", transE2);
+
+        
+        Map<String, String> transE3 = new HashMap<>();
+        transE3.put("a", "E4");
+        transiciones.put("E3", transE3);
+
+        
+        transiciones.put("E4", new HashMap<>());
+    }
+
+    public boolean procesarCadena(String cadena) {
+        estadoActual = estadoInicial;
+
+        for (int i = 0; i < cadena.length(); i++) {
+            String simbolo = String.valueOf(cadena.charAt(i));
+
+            if (!transiciones.containsKey(estadoActual) || 
+                !transiciones.get(estadoActual).containsKey(simbolo)) {
+                System.out.println("Transición no definida: Estado " + estadoActual + " con símbolo '" + simbolo + "'");
+                return false;
+            }
+
+            estadoActual = transiciones.get(estadoActual).get(simbolo);
+        }
+
+      
+        for (String estado : estadosAceptacion) {
+            if (estadoActual.equals(estado)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static void main(String[] args) {
+        AutomataFD3 automata = new AutomataFD3();
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Introduce una cadena (solo a, b, c): ");
+        String cadena = scanner.nextLine();
+
+        if (!cadena.matches("[abc]+")) {
+            System.out.println("Cadena inválida. Solo se permiten 'a', 'b', 'c'.");
+        } else {
+            boolean aceptada = automata.procesarCadena(cadena);
+            System.out.println(aceptada ? "Cadena aceptada" : "Cadena rechazada");
+        }
+
+        scanner.close();
+    }
+}
