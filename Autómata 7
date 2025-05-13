@@ -1,0 +1,70 @@
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+
+public class AutomataFD2 {
+    private String estadoActual;
+    private final String estadoInicial = "E1";
+
+    private final Map<String, Map<String, String>> transiciones;
+
+    public AutomataFD2() {
+        estadoActual = estadoInicial;
+        transiciones = new HashMap<>();
+
+        
+        Map<String, String> transE1 = new HashMap<>();
+        transE1.put("a", "E2");
+        transE1.put("b", "E2");
+        transiciones.put("E1", transE1);
+
+        Map<String, String> transE2 = new HashMap<>();
+        transE2.put("a", "E3");
+        transE2.put("b", "E3");
+        transiciones.put("E2", transE2);
+
+        Map<String, String> transE3 = new HashMap<>();
+        transE3.put("a", "E4");
+        transE3.put("b", "E4");
+        transiciones.put("E3", transE3);
+
+        Map<String, String> transE4 = new HashMap<>();
+        transE4.put("a", "E4");
+        transE4.put("b", "E4");
+        transiciones.put("E4", transE4);
+    }
+
+    public void procesarCadena(String cadena) {
+        estadoActual = estadoInicial;
+
+        for (int i = 0; i < cadena.length(); i++) {
+            String simbolo = String.valueOf(cadena.charAt(i));
+
+            if (!transiciones.containsKey(estadoActual) ||
+                !transiciones.get(estadoActual).containsKey(simbolo)) {
+                System.out.println("Error: símbolo no válido '" + simbolo + "' en estado " + estadoActual);
+                return;
+            }
+
+            estadoActual = transiciones.get(estadoActual).get(simbolo);
+        }
+
+        System.out.println("Cadena procesada correctamente. Estado final: " + estadoActual);
+    }
+
+    public static void main(String[] args) {
+        AutomataFD2 automata = new AutomataFD2();
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Introduce una cadena (solo 'a' y 'b'): ");
+        String cadena = scanner.nextLine();
+
+        if (!cadena.matches("[ab]+")) {
+            System.out.println("Cadena inválida. Solo se permiten 'a' y 'b'.");
+        } else {
+            automata.procesarCadena(cadena);
+        }
+
+        scanner.close();
+    }
+}
